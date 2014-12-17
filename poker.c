@@ -2,6 +2,16 @@
 #include <stdlib.h>
 #include <time.h>
 
+struct pattern {
+    int computerScore;
+    int playerScore;
+    char p;
+    int obtained;
+    char *name;
+  };
+
+struct pattern table[15];
+
 void fillRandomDies(int die[5]){
   int i;
   for (i=0; i<5; i++)
@@ -33,7 +43,8 @@ void reroll(int die[5], int *rerollCount){
   }
 
   else
-    *rerollCount=3;    
+    *rerollCount=3;
+  system("clear");
 }
 
 void countDies(int die[5], int countAmount[5]){
@@ -49,12 +60,16 @@ void countDies(int die[5], int countAmount[5]){
   }
 }
 
+void getScore(struct pattern table[15], int countAmount[5]){
+  
+}
+
 void playerMove(int die[5], int *rerollCount, int countAmount[5]){
-  while (*rerollCount<3){
+  while (*rerollCount<2){
     reroll(die, rerollCount);
     showDies(die);
-    countDies(die, countAmount);
   }
+  countDies(die, countAmount);
 }
 
 int main(){
@@ -67,16 +82,10 @@ int main(){
   int *rerollCount, count = 0;
   rerollCount = &count;
   
-  struct pattern {
-    int computerScore;
-    int playerScore;
-    char p;
-    int obtained;
-    char *name;
-  };
+  //TU COPY1
 
   char *names[]={"ones", "twoes", "threes", "fours", "fives", "sixes", "pair", "pairs", "triple", "mStreet", "bStreet", "full", "quadlet", "poker", "chance"};
-  printf("\n %s\n", names[0]);
+
   struct pattern ones;
   struct pattern twoes;
   struct pattern threes;
@@ -93,7 +102,7 @@ int main(){
   struct pattern poker;
   struct pattern chance;
 
-  struct pattern table[15];
+  //TU COPY2
   
   table[0]=ones;
   table[1]=twoes;
@@ -123,7 +132,8 @@ int main(){
     z++;
     table[i].obtained = 0;
   }
-
+  system("clear");
+  getScore(table, countAmount);
   fillRandomDies(die);
   showDies(die);
 
