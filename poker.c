@@ -70,13 +70,59 @@ int main(){
   struct pattern {
     int computerScore;
     int playerScore;
+    char p;
+    int obtained;
+    char *name;
   };
 
+  char *names[]={"ones", "twoes", "threes", "fours", "fives", "sixes", "pair", "pairs", "triple", "mStreet", "bStreet", "full", "quadlet", "poker", "chance"};
+  printf("\n %s\n", names[0]);
   struct pattern ones;
-  
-  struct pattern table[15];
+  struct pattern twoes;
+  struct pattern threes;
+  struct pattern fours;
+  struct pattern fives;
+  struct pattern sixes;
+  struct pattern pair;
+  struct pattern pairs;
+  struct pattern triple;
+  struct pattern mStreet;
+  struct pattern bStreet;
+  struct pattern full;
+  struct pattern quadlet;
+  struct pattern poker;
+  struct pattern chance;
 
+  struct pattern table[15];
+  
   table[0]=ones;
+  table[1]=twoes;
+  table[2]=threes;
+  table[3]=fours;
+  table[4]=fives;
+  table[5]=sixes;
+  table[6]=pair;
+  table[7]=pairs;
+  table[8]=triple;
+  table[9]=mStreet;
+  table[10]=bStreet;
+  table[11]=full;
+  table[12]=quadlet;
+  table[13]=poker;
+  table[14]=chance;
+  
+  for (i=0; i<15; i++){
+    table[i].name = names[i];
+  }
+
+  char z = 'a';
+  for (i=0; i<15; i++){
+    table[i].playerScore=-1;
+    table[i].computerScore=-1;
+    table[i].p=z;
+    z++;
+    table[i].obtained = 0;
+  }
 
   fillRandomDies(die);
   showDies(die);
@@ -85,7 +131,3 @@ int main(){
 
   return 0;
 }
-
-/*
-
-*/
