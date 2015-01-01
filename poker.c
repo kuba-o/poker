@@ -8,6 +8,9 @@ struct pattern {
     char p;
     int obtained;
     char *name;
+    int maxValue;
+    int currentValue;
+    float currentValuesPercent;
   };
   int i, j;
 struct pattern table[15];
@@ -25,9 +28,9 @@ void showDies(int die[5]){
 
 void reroll(int die[5], int *rerollCount){
   int a;
+
   (*rerollCount)++;
   char ruch[5] = {-100, -100, -100, -100, -100};
-  
   printf("Reroll: \n");
   scanf("%s", ruch);
   i=0;
@@ -45,10 +48,27 @@ void reroll(int die[5], int *rerollCount){
   system("clear");
 }
 
-void countDies(int die[5], int countAmount[6]){
-  for (i=0; i<6; i++)
-    countAmount[i]=0;
+void computerMove(int die[5], struct pattern table[15]){
+  int i=0;
 
+  for (i=0; i<15; i++){
+    table[i].currentValuesPercent=table[i].currentValue/table[i].maxValue*100;
+  }
+}
+
+void resetCounted(int die[5], int countAmount[6]){
+    for (i=0; i<6; i++)
+    countAmount[i]=0;
+    
+    for (i=0; i<6; i++){
+      for (j=0; j<6; j++){
+        if (die[j]==(i+1))  
+          countAmount[i]++;
+      }
+    }
+}
+
+void countDies(int die[5], int countAmount[6]){
   for (i=0; i<6; i++){
     for (j=0; j<6; j++){
       if (die[j]==(i+1))  
@@ -58,104 +78,111 @@ void countDies(int die[5], int countAmount[6]){
 }
 
 void getScore(int die[5], struct pattern table[15], int countAmount[6]){
-  if (countAmount[0]!=0){
-    printf("To chose the \"%s\" category, press %c.\n", table[0].name, table[0].p);
-  }
+    resetCounted(die, countAmount);
+    table[0].currentValue=(countAmount[0]-3)*1;
 
-  if (countAmount[1]!=0){
-    printf("To chose the \"%s\" category, press %c.\n", table[1].name, table[1].p);
-  }
+    table[1].currentValue=(countAmount[1]-3)*2;
 
-  if (countAmount[2]!=0){
-    printf("To chose the \"%s\" category, press %c.\n", table[2].name, table[2].p);
-  }
+    table[2].currentValue=(countAmount[2]-3)*3;
 
-  if (countAmount[3]!=0){
-    printf("To chose the \"%s\" category, press %c.\n", table[3].name, table[3].p);
-  }
+    table[3].currentValue=(countAmount[3]-3)*4;
+  
+    table[4].currentValue=(countAmount[4]-3)*5;
 
-  if (countAmount[4]!=0){
-    printf("To chose the \"%s\" category, press %c.\n", table[4].name, table[4].p);
-  }
-
-  if (countAmount[5]!=0){
-    printf("To chose the \"%s\" category, press %c.\n", table[5].name, table[5].p);
-  }
+    table[5].currentValue=(countAmount[5]-3)*6;
 
   //pair
-  for (i=5; i>-1; i--){ 
+  for (i=0; i<5; i++){
     if (countAmount[i]>1){
-      printf("To chose the \"%s\" category, press %c.\n", table[6].name, table[6].p);
-      //printf("WYNIK TO %d\n", 2*die[i]);
-      break;
+      table[6].currentValue=2*(i+1);
     }
   }
+  
   int done = 0;
-  
+  int i=0;
+  int j=0;
+
   //pairs
-  for (i=5; i>-1; i--){
-    for (j=5; j>-1; j--){
-      if (countAmount[i]>1 && countAmount[j]>1 && i!=j){
-        printf("To chose the \"%s\" category, press %c.\n", table[7].name, table[7].p);
-        done++;
-        break;
-      }
-      if(done!=0)
-        break;
+  resetCounted(die, countAmount);
+  int a=-1;
+  int b=-1;
+  for (i=0; i<6; i++){
+    if (countAmount[i]>1){
+      a=i;
     }
   }
-  done = 0;
   
-  //triple
-  for (i=5; i>-1; i--){ 
-    if (countAmount[i]>2){
-      printf("To chose the \"%s\" category, press %c.\n", table[8].name, table[8].p);
-      //printf("WYNIK TO %d\n", 2*die[i]);
-      break;
+  for (j=0; j<a; j++){
+    if (countAmount[j]>1){
+      b=j;
     }
   }
+  if (a!=-1 && b!=-1)
+    table[7].currentValue=(2*(a+1) + 2*(b+1));
+
+  //triple
+  for (i=0; i<5; i++){
+    if (countAmount[i]>2){
+      table[8].currentValue=3*(i+1);
+    }
+  }
+
   //mStrit
   if(countAmount[0]==1 && countAmount[1]==1 && countAmount[2]==1 && countAmount[3]==1 && countAmount[4]==1){
-      printf("To chose the \"%s\" category, press %c.\n", table[9].name, table[9].p);
+    table[9].currentValue=15; 
   }
 
   //dStrit
   if(countAmount[1]==1 && countAmount[2]==1 && countAmount[3]==1 && countAmount[4]==1 && countAmount[5]==1){
-      printf("To chose the \"%s\" category, press %c.\n", table[10].name, table[10].p);
+    table[10].currentValue=20;
   }
+
   //full
-  for (i=5; i>-1; i--){
-    for (j=5; j>-1; j--){
-      if (countAmount[i]==3 && countAmount[j]==2 && i!=j){
-        printf("To chose the \"%s\" category, press %c.\n", table[11].name, table[11].p);
-        done++;
-        break;
-      }
-      if(done!=0)
-        break;
-    }
-  }
-  //quadlet
-  for (i=5; i>-1; i--){ 
-    if (countAmount[i]>3){
-      printf("To chose the \"%s\" category, press %c.\n", table[12].name, table[12].p);
-      break;
+  a=-1;
+  b=-1;
+  for (i=0; i<6; i++){
+    if (countAmount[i]>2){
+      a=i;
     }
   }
 
+  for (j=0; j<6; j++){
+    if (countAmount[j]==2){
+      b=j;
+    }
+  }
+  
+  if (a!=-1 && b!=-1){
+    table[11].currentValue=3*(a+1) + 2*(b+1) + 10;  
+  }
+
+  //quadlet
+  for (i=0; i<6; i++){
+    if (countAmount[i]>3)
+      table[12].currentValue=4*(i+1)+20;
+  }
+  
   //poker
   for (i=0; i<6; i++){
     if (countAmount[i]==5){
-      printf("To chose the \"%s\" category, press %c.\n", table[13].name, table[13].p);
+      table[13].currentValue=5*(i+1)+50;
     }
   }
 
   //chance
   int chance = 0;
   for (i=0; i<6; i++){ 
-    chance+=die[i];
+    table[14].currentValue+=die[i];
   }
-      printf("To chose the \"%s\" category, press %c.\n", table[14].name, table[14].p);  
+
+  //print out possible choices
+  for (i = 0; i<6; i++)
+    printf("%d is a current value of the %s pattern\n",table[i].currentValue, table[i].name);
+  for (i=6; i<15; i++){
+    if (table[i].currentValue!=0){
+      printf("%d is a current value of the %s pattern\n",table[i].currentValue, table[i].name);
+    }
+  }
 }
 
 void playerMove(int die[5], int *rerollCount, int countAmount[6]){
@@ -175,7 +202,7 @@ int main(){
   int countAmount[6];
   int *rerollCount, count = 0;
   rerollCount = &count;
-
+  
   char *names[]={"ones", "twoes", "threes", "fours", "fives", "sixes", "pair", "pairs", "triple", "mStrit", "bStrit", "full", "quadlet", "poker", "chance"};
   struct pattern ones;
   struct pattern twoes;
@@ -192,6 +219,9 @@ int main(){
   struct pattern quadlet;
   struct pattern poker;
   struct pattern chance;
+
+  //chance is set to 25, free to change
+  int maxValues[]={3, 6, 9, 12, 15, 18, 12, 22, 18, 15, 20, 38, 40, 80, 25};
   
   table[0]=ones;
   table[1]=twoes;
@@ -211,6 +241,9 @@ int main(){
   
   for (i=0; i<15; i++){
     table[i].name = names[i];
+    table[i].maxValue = maxValues[i];
+    table[i].currentValue=0;
+    table[i].currentValuesPercent=0;
   }
 
   char z = 'a';
@@ -222,9 +255,13 @@ int main(){
     table[i].obtained = 0;
   }
   system("clear");  
+  computerMove(die, table);
   fillRandomDies(die);
-  showDies(die);
+  showDies(die); 
   playerMove(die, rerollCount, countAmount);
+
+  computerMove(die, table);
+
 
   return 0;
 }
