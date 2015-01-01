@@ -50,9 +50,11 @@ void reroll(int die[5], int *rerollCount){
 
 void computerMove(int die[5], struct pattern table[15]){
   int i=0;
-
+  int tempPercent=-1;
   for (i=0; i<15; i++){
-    table[i].currentValuesPercent=table[i].currentValue/table[i].maxValue*100;
+
+    printf("%f procent %s\n", 100*(table[i].currentValue/(table[i].maxValue*1.0)), table[i].name);
+    
   }
 }
 
@@ -174,24 +176,61 @@ void getScore(int die[5], struct pattern table[15], int countAmount[6]){
   for (i=0; i<6; i++){ 
     table[14].currentValue+=die[i];
   }
+}
 
+void getPattern(int *rerollCount, int countAmount[6], struct pattern table[15]){
+  char choice;
+  int a=-2;
   //print out possible choices
-  for (i = 0; i<6; i++)
-    printf("%d is a current value of the %s pattern\n",table[i].currentValue, table[i].name);
-  for (i=6; i<15; i++){
-    if (table[i].currentValue!=0){
-      printf("%d is a current value of the %s pattern\n",table[i].currentValue, table[i].name);
+  for (i = 0; i<6; i++){
+    if (table[i].obtained==0){
+      printf("%d is a current value of the %s pattern, press %c to chose this score\n",table[i].currentValue, table[i].name, table[i].p);
     }
   }
+
+  for (i=6; i<15; i++){
+    if (table[i].obtained==0){
+      printf("%d is a current value of the %s pattern, press %c to chose this score\n",table[i].currentValue, table[i].name, table[i].p);
+    }
+  }
+  printf("Give me your choice: ");
+  scanf(" %c", &choice);  
+  a = (int) (choice - 97);
+
+  while (table[a].obtained==1){
+    printf("You can't fill that pattern, chose different: ");
+    scanf(" %c", &choice);
+    a = (int) (choice - 97);
+  }
+
+  table[a].obtained=1;
+  
+}
+
+void patternsToGet(struct pattern table[15]){
+  printf("Below are patterns which you are still missing: \n");
+  for (i=0; i<15; i++){
+    if (table[i].obtained==0)
+      printf("%s\n", table[i].name);
+  }
+  printf("\n");
 }
 
 void playerMove(int die[5], int *rerollCount, int countAmount[6]){
+  patternsToGet(table); 
+  fillRandomDies(die);
+  showDies(die);
+  
   while (*rerollCount<2){
     reroll(die, rerollCount);
+    patternsToGet(table);
     showDies(die);
   }
+
   countDies(die, countAmount);
   getScore(die, table, countAmount);
+  getPattern(rerollCount, countAmount, table);
+  *rerollCount=0;
 }
 
 int main(){
@@ -239,29 +278,23 @@ int main(){
   table[13]=poker;
   table[14]=chance;
   
+  char z = 'a';
   for (i=0; i<15; i++){
     table[i].name = names[i];
     table[i].maxValue = maxValues[i];
     table[i].currentValue=0;
     table[i].currentValuesPercent=0;
-  }
-
-  char z = 'a';
-  for (i=0; i<15; i++){
     table[i].playerScore=-1;
     table[i].computerScore=-1;
     table[i].p=z;
     z++;
     table[i].obtained = 0;
   }
+
   system("clear");  
-  computerMove(die, table);
-  fillRandomDies(die);
-  showDies(die); 
+ 
   playerMove(die, rerollCount, countAmount);
-
-  computerMove(die, table);
-
-
+  playerMove(die, rerollCount, countAmount);
+  
   return 0;
 }
