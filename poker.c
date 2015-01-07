@@ -170,10 +170,11 @@ void getScore(int die[5], struct pattern table[15], int countAmount[6]){
 
 void getPattern(int *rerollCount, int countAmount[6], struct pattern table[15]){
   char choice;
-  int a=-2;
+  int a;
+
   //print out possible choices
   for (i = 0; i<6; i++){
-    if (table[i].obtained==0 && table[i].currentValue!=0){
+    if (table[i].obtained==0){
       printf("%d is a current value of the %s pattern, press %c to chose this score\n",table[i].currentValue, table[i].name, table[i].p);
     }
   }
@@ -187,11 +188,8 @@ void getPattern(int *rerollCount, int countAmount[6], struct pattern table[15]){
   
   printf("Give me your choice: \n");
   scanf(" %c", &choice);
-
-  /*
-    
   a = (int) (choice - 97);
-  */
+
   //while chosen ?
   if (choice == 'z'){
     for (i=0; i<15; i++){
@@ -201,17 +199,23 @@ void getPattern(int *rerollCount, int countAmount[6], struct pattern table[15]){
     }
     scanf(" %c", &choice);
     a = (int) (choice - 97);
+    printf("###############3%d\n", a);
+    table[a].playerScore=0;
     table[a].obtained=1;
   }
+
   else{
     while (table[a].obtained==1){
-    printf("You can't fill that pattern, chose different: ");
-    scanf(" %c", &choice);
-    a = (int) (choice - 97);
+      printf("You can't fill that pattern, chose different: ");
+      scanf(" %c", &choice);
+      a = (int) (choice - 97);
+      printf("!!!!!!!!!!!!!!!!!!!%d\n", a);
     }
+    printf("@@@@@@@@@@@@@@@@@@@@@@@@%d\n", a);
+    table[a].playerScore = table[a].currentValue;
     table[a].obtained=1;  
   }
-} //end of function
+} //end of getPattern function
 
 void patternsToGet(struct pattern table[15]){
     system("clear");
@@ -304,7 +308,7 @@ int main(){
     table[i].maxValue = maxValues[i];
     table[i].currentValue=0;
     table[i].currentValuesPercent=0;
-    table[i].playerScore=-1;
+    table[i].playerScore=1;
     table[i].computerScore=-1;
     table[i].p=z;
     z++;
@@ -314,6 +318,11 @@ int main(){
   system("clear");  
  
   playerMove(die, rerollCount, countAmount);
+  
+  for (i=0; i<15; i++){
+    printf("playerScore: %d\n", table[i].obtained);
+  }
+  
   playerMove(die, rerollCount, countAmount);
 
   return 0;
