@@ -48,16 +48,6 @@ void reroll(int die[5], int *rerollCount){
   system("clear");
 }
 
-void computerMove(int die[5], struct pattern table[15]){
-  int i=0;
-  int tempPercent=-1;
-  for (i=0; i<15; i++){
-
-    printf("%f procent %s\n", 100*(table[i].currentValue/(table[i].maxValue*1.0)), table[i].name);
-    
-  }
-}
-
 void resetCounted(int die[5], int countAmount[6]){
     for (i=0; i<6; i++)
     countAmount[i]=0;
@@ -183,31 +173,48 @@ void getPattern(int *rerollCount, int countAmount[6], struct pattern table[15]){
   int a=-2;
   //print out possible choices
   for (i = 0; i<6; i++){
-    if (table[i].obtained==0){
+    if (table[i].obtained==0 && table[i].currentValue!=0){
       printf("%d is a current value of the %s pattern, press %c to chose this score\n",table[i].currentValue, table[i].name, table[i].p);
     }
   }
 
   for (i=6; i<15; i++){
-    if (table[i].obtained==0){
+    if (table[i].obtained==0 && table[i].currentValue!=0){
       printf("%d is a current value of the %s pattern, press %c to chose this score\n",table[i].currentValue, table[i].name, table[i].p);
     }
   }
-  printf("Give me your choice: ");
-  scanf(" %c", &choice);  
-  a = (int) (choice - 97);
+  printf("If you prefer to cross out a category, press z.\n");
+  
+  printf("Give me your choice: \n");
+  scanf(" %c", &choice);
 
-  while (table[a].obtained==1){
+  /*
+    
+  a = (int) (choice - 97);
+  */
+  //while chosen ?
+  if (choice == 'z'){
+    for (i=0; i<15; i++){
+      if (table[i].obtained==0){
+        printf("To cross out the %s pattern, press %c. \n", table[i].name, table[i].p);
+      }
+    }
+    scanf(" %c", &choice);
+    a = (int) (choice - 97);
+    table[a].obtained=1;
+  }
+  else{
+    while (table[a].obtained==1){
     printf("You can't fill that pattern, chose different: ");
     scanf(" %c", &choice);
     a = (int) (choice - 97);
+    }
+    table[a].obtained=1;  
   }
-
-  table[a].obtained=1;
-  
-}
+} //end of function
 
 void patternsToGet(struct pattern table[15]){
+    system("clear");
   printf("Below are patterns which you are still missing: \n");
   for (i=0; i<15; i++){
     if (table[i].obtained==0)
@@ -231,6 +238,19 @@ void playerMove(int die[5], int *rerollCount, int countAmount[6]){
   getScore(die, table, countAmount);
   getPattern(rerollCount, countAmount, table);
   *rerollCount=0;
+}
+
+void computerMove(int die[5], struct pattern table[15]){
+  int i=0;
+  float temp1=-100;
+  float temp2=-100;
+  for (i=0; i<15; i++){
+    printf("%f procent %s\n", 100*(table[i].currentValue/(table[i].maxValue*1.0)), table[i].name);
+    table[i].currentValuesPercent = 100*(table[i].currentValue/(table[i].maxValue*1.0));
+  }
+  for (i=0; i<15; i++){
+    
+  }
 }
 
 int main(){
@@ -295,6 +315,6 @@ int main(){
  
   playerMove(die, rerollCount, countAmount);
   playerMove(die, rerollCount, countAmount);
-  
+
   return 0;
 }
