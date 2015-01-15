@@ -71,7 +71,9 @@ void countDies(int die[5], int countAmount[6]){
 
 void theScore(int die[5], struct pattern table[15], int countAmount[6], int number, int canReroll[5]){
   resetCounted(die, countAmount);
-  int temp;
+  int *temp;
+  int a = 0;
+  temp=&a;
   int value;
 
   if (number == 0){ //ones
@@ -92,7 +94,7 @@ void theScore(int die[5], struct pattern table[15], int countAmount[6], int numb
     for (i = 0; i<5; i++){
       if (die[i]!=3)
         canReroll[i]=1;
-    }
+    }  
   }
 
   if (number == 3){ //fours
@@ -113,39 +115,43 @@ void theScore(int die[5], struct pattern table[15], int countAmount[6], int numb
     for (i = 0; i<5; i++){
       if (die[i]!=6)
         canReroll[i]=1;
+    
     }
   }  
 
   if (number == 6){ //pair
-    printf("LOL");
-    for (i=0; i<5; i++){
+    for (i=0; i<6; i++){
       if (countAmount[i]>1){
-        temp = i+1;
+        *temp = i+1;
       }
-      printf("%d\n", temp);
-      for (i=0; i<5; i++){
-        if (die[i]!=temp)
-          canReroll[i]=1;
-      }
+    }
+    for (i=0; i<5; i++){
+      if (die[i]!=*temp)
+        canReroll[i]=1;
     }
   }
 
   if (number == 7){ //pairs
-    int a=-1;
-    int b=-1;
-    for (i=0; i<6; i++){
-      if (countAmount[i]>1){
-        a=i;
+    int a = -1;
+    int b = -1;
+    int val;
+      for (i=0; i<6; i++){
+        if (countAmount[i]>1){
+          a=i;
+        }
       }
-    }
     
     for (j=0; j<a; j++){
       if (countAmount[j]>1){
         b=j;
       }
     }
-    //if (a!=-1 && b!=-1)
-     // table[7].currentValue=(2*(a+1) + 2*(b+1));
+
+    for (i=0; i<5; i++){
+      if (die[i]!=a+1  && die[i]!=b+1){
+        canReroll[i]=1;
+      }     
+    }
   }
 }
 
@@ -407,6 +413,8 @@ int main(){
   
 
   playerMove(die, rerollCount, countAmount);  
+  for (i=0; i<6; i++)
+    printf("ILOSC %d to:  %d\n",i+1, countAmount[i]);
   /*
   fillRandomDies(die);
   
