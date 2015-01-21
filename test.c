@@ -17,7 +17,7 @@ struct pattern table[15];
 
 void fillRandomDies(int die[5]){
   for (i=0; i<5; i++)
-    die[i]=rand()%5+1;
+    die[i]=rand()%6+1;
 }
 
 void showDies(int die[5]){
@@ -38,7 +38,7 @@ void reroll(int die[5], int *rerollCount){
   if (ruch[0]!='x'){
     while (ruch[i]!='\0'){
       a = (int)(ruch[i] - '0');
-      die[a-1] = rand()%5+1;
+      die[a-1] = rand()%6+1;
       i++;
     }
   }
@@ -60,8 +60,18 @@ void resetCounted(int die[5], int countAmount[6]){
     }
 }
 
+void countDies(int die[5], int countAmount[6]){
+  for (i=0; i<6; i++){
+    for (j=0; j<6; j++){
+      if (die[j]==(i+1))  
+        countAmount[i]++;
+    }
+  }
+}
+
 void theScore(int die[5], struct pattern table[15], int countAmount[6], int number, int canReroll[5]){
   resetCounted(die, countAmount);
+  
   int *temp;
   int a = 0;
   temp=&a;
@@ -125,7 +135,6 @@ void theScore(int die[5], struct pattern table[15], int countAmount[6], int numb
   if (number == 7){ //pairs
     int a = -1;
     int b = -1;
-    int val;
       for (i=0; i<6; i++){
         if (countAmount[i]>1){
           a=i;
@@ -137,11 +146,10 @@ void theScore(int die[5], struct pattern table[15], int countAmount[6], int numb
         b=j;
       }
     }
-
     for (i=0; i<5; i++){
       if (die[i]!=a+1  && die[i]!=b+1){
         canReroll[i]=1;
-      }     
+      }
     }
   }
 
@@ -154,8 +162,53 @@ void theScore(int die[5], struct pattern table[15], int countAmount[6], int numb
     for (i=0; i<5; i++){
       if (die[i]!=*temp)
         canReroll[i]=1;
+    } 
+  }
+  /*
+  if (number == 9){ //Strit
+
+  }
+  
+  if (number == 10){ //bStrit
+  
+  }
+    
+  if (number == 11){ //full
+    int a = -1;
+    int b = -1;
+    for (i=0; i<6; i++){
+        if (countAmount[i]>2){
+          a=i;
+        }
+      }
+    
+    for (j=0; j<6; j++){
+      if (countAmount[j]>1){
+        b=j;
+      }
+    }
+    printf("THEBUG: %d     %d\n", a, b);
+    for (i=0; i<5; i++){
+      if (die[i]!=a+1  && die[i]!=b+1){
+        canReroll[i]=1;
+      }     
     }
   }
+  
+  if (number == 12){ //quadlet
+    for (i=0; i<6; i++){
+      if (countAmount[i]>3){
+        *temp=i+1;
+      }
+    }
+
+    for (i=0; i<5; i++){
+      if (die[i]!=*temp)
+        canReroll[i]=1;
+    }
+  }
+  */
+
 }
 
 void getScore(int die[5], struct pattern table[15], int countAmount[6]){
@@ -250,6 +303,7 @@ void getScore(int die[5], struct pattern table[15], int countAmount[6]){
   }
 
   //chance
+  table[14].currentValue=0;
   int chance = 0;
   for (i=0; i<6; i++){ 
     table[14].currentValue+=die[i];
@@ -348,8 +402,6 @@ void computerMove(int die[5], struct pattern table[15]){
       }
     }
   }
-  printf("TEST\n");
-  printf("%d\n", temp);
 }
 
 int main(){
@@ -412,9 +464,25 @@ int main(){
   }
 
   system("clear");  
-  int test = 6;
+  int test = 11;
   
-  playerMove(die, rerollCount, countAmount);  
-  
+  playerMove(die, rerollCount, countAmount);
+
+  die[0]=1;
+  die[1]=1;
+  die[2]=5;
+  die[3]=5;
+  die[4]=5;
+  showDies(die);
+  resetCounted(die, countAmount);
+  theScore(die, table, countAmount, test, canReroll);
+
+  for (i=0; i<6; i++)
+      printf("THE countAmount of %d is %d\n", i, countAmount[i]);
+
+  for (i=0; i<5; i++){
+    if (canReroll[i]==1)
+      printf("I can reroll %d\n", i);
+  }
   return 0;
 }
