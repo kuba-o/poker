@@ -304,45 +304,66 @@ void getScore(int die[5], struct pattern table[15], int countAmount[6]){
 void getPattern(int *rerollCount, int countAmount[6], struct pattern table[15]){
   char choice;
   int a;
-
+  int ifCrossed=1;
   for (i = 0; i<6; i++){
-    if (table[i].obtained==0){
+    if (table[i].playerScore==-100){
+      ifCrossed=0;
       printf("%d is a current value of the %s pattern, press %c to chose this score\n",table[i].currentValue, table[i].name, table[i].p);
     }
   }
 
   for (i=6; i<15; i++){
-    if (table[i].obtained==0 && table[i].currentValue!=0){
+    
+    if (table[i].playerScore==-100 && table[i].currentValue!=0){
+      ifCrossed=0;
       printf("%d is a current value of the %s pattern, press %c to chose this score\n",table[i].currentValue, table[i].name, table[i].p);
     }
   }
-  printf("If you prefer to cross out a category, press z.\n");
-  
-  printf("Give me your choice: \n");
-  scanf(" %c", &choice);
-  a = (int) (choice - 97);
-
-  if (choice == 'z'){
-    for (i=0; i<15; i++){
-      if (table[i].obtained==0){
-        printf("To cross out the %s pattern, press %c. \n", table[i].name, table[i].p);
-      }
-    }
+  if (ifCrossed==0){
+    printf("Give me your choice: \n");
     scanf(" %c", &choice);
     a = (int) (choice - 97);
+
+    while (table[a].playerScore!=-100){
+        printf("You can't fill that pattern, chose different: ");
+        scanf(" %c", &choice);
+        a = (int) (choice - 97);
+      }
+
+
+      table[a].playerScore=table[a].currentValue;
+      //table[a].obtained=1;
+    }
+  else if (ifCrossed==1){
+    printf("This combination cannot be accepted anywhere. You have to cross out a category.\n");
+    
+    for (i=0; i<15; i++){
+        if (table[i].playerScore==-100){
+          printf("To cross out the %s pattern, press %c. \n", table[i].name, table[i].p);
+        }
+      }
+   
+    scanf(" %c", &choice); 
+    a = (int) (choice - 97);
+    printf("POKAZUJE a: %d\n", a);
+    while (table[a].playerScore!=-100){
+          printf("You can't fill that pattern, chose different: ");
+          scanf(" %c", &choice);
+          a = (int) (choice - 97);
+          printf("POKAZUJE a: %d\n", a);
+    }
     table[a].playerScore=0;
-    table[a].obtained=1;
+  }
+  if (choice == 'z'){
+    
+    
+    a = (int) (choice - 97);
+    
+    //table[a].obtained=1;
   }
 
   else{
-    while (table[a].obtained==1){
-      printf("You can't fill that pattern, chose different: ");
-      scanf(" %c", &choice);
-      a = (int) (choice - 97);
-    }
-
-    table[a].playerScore=table[a].currentValue;
-    table[a].obtained=1;  
+      
   }
 } //end of getPattern function
 
@@ -350,7 +371,7 @@ void patternsToGet(struct pattern table[15]){
     system("clear");
   printf("Below are patterns which you are still missing: \n");
   for (i=0; i<15; i++){
-    if (table[i].obtained==0)
+    if (table[i].playerScore==-100)
       printf("%s\n", table[i].name);
   }
   printf("\n");
@@ -491,7 +512,7 @@ int main(){
     table[i].maxValue = maxValues[i];
     table[i].currentValue=0;
     table[i].currentValuesPercent=0;
-    table[i].playerScore=1;
+    table[i].playerScore=-100;
     table[i].computerScore=-100;
     table[i].p=z;
     z++;
