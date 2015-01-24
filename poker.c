@@ -6,22 +6,23 @@ struct pattern {
     int computerScore;
     int playerScore;
     char p;
-    int obtained;
+    //int obtained;
     char *name;
     int maxValue;
     int currentValue;
     float currentValuesPercent;
   };
+  
   int i, j;
 struct pattern table[15];
 
 void fillRandomDies(int die[5]){
   for (i=0; i<5; i++)
-    die[i]=rand()%5+1;
+    die[i]=rand()%6+1;
 }
 
 void showDies(int die[5]){
-  printf("Here are your actual values on the dies: \n");
+  printf("Here are actual values on the dies: \n");
   for (i=0; i<5; i++)
     printf("%i: %i\n", i+1, die[i]);
 }
@@ -38,7 +39,7 @@ void reroll(int die[5], int *rerollCount){
   if (ruch[0]!='x'){
     while (ruch[i]!='\0'){
       a = (int)(ruch[i] - '0');
-      die[a-1] = rand()%5+1;
+      die[a-1] = rand()%6+1;
       i++;
     }
   }
@@ -49,15 +50,23 @@ void reroll(int die[5], int *rerollCount){
 }
 
 void resetCounted(int die[5], int countAmount[6]){
-    for (i=0; i<6; i++)
+  for (i=0; i<6; i++)
     countAmount[i]=0;
-    
-    for (i=0; i<6; i++){
-      for (j=0; j<6; j++){
-        if (die[j]==(i+1))  
-          countAmount[i]++;
-      }
+  for (i=0; i<6; i++){
+    for (j=0; j<6; j++){
+      if (die[j]==(i+1))  
+        countAmount[i]++;
     }
+  }
+}
+
+void countDies(int die[5], int countAmount[6]){
+  for (i=0; i<6; i++){
+    for (j=0; j<6; j++){
+      if (die[j]==(i+1))  
+        countAmount[i]++;
+    }
+  }
 }
 
 void theScore(int die[5], struct pattern table[15], int countAmount[6], int number, int canReroll[5]){
@@ -105,8 +114,7 @@ void theScore(int die[5], struct pattern table[15], int countAmount[6], int numb
   if (number == 5){ //sixes
     for (i = 0; i<5; i++){
       if (die[i]!=6)
-        canReroll[i]=1;
-    
+        canReroll[i]=1; 
     }
   }  
 
@@ -125,7 +133,6 @@ void theScore(int die[5], struct pattern table[15], int countAmount[6], int numb
   if (number == 7){ //pairs
     int a = -1;
     int b = -1;
-    int val;
       for (i=0; i<6; i++){
         if (countAmount[i]>1){
           a=i;
@@ -137,14 +144,13 @@ void theScore(int die[5], struct pattern table[15], int countAmount[6], int numb
         b=j;
       }
     }
-
     for (i=0; i<5; i++){
       if (die[i]!=a+1  && die[i]!=b+1){
         canReroll[i]=1;
-      }     
+      }
     }
   }
-
+  
   if (number == 8){ //triple
     for (i=0; i<6; i++){
       if (countAmount[i]>2){
@@ -154,37 +160,68 @@ void theScore(int die[5], struct pattern table[15], int countAmount[6], int numb
     for (i=0; i<5; i++){
       if (die[i]!=*temp)
         canReroll[i]=1;
-    }
+    } 
   }
+    
+  if (number == 11){ //full
+    int a = -1;
+    int b = -1;
+    for (i=0; i<6; i++){
+        if (countAmount[i]>2){
+          a=i;
+        }
+      }
+      
+    for (i=0; i<6; i++){
+      if (countAmount[i]>1 && (countAmount[i]!=countAmount[a])){
+        b=i;
+      }
+    }
+    
+    for (i=0; i<5; i++){
+      if (die[i]!=a+1  && die[i]!=b+1){
+        canReroll[i]=1;
+      }     
+    }
+  
+  }
+  
+  if (number == 12){ //quadlet
+    for (i=0; i<6; i++){
+      if (countAmount[i]>3){
+        *temp=i+1;
+      }
+    }
+
+    for (i=0; i<5; i++){
+      if (die[i]!=*temp)
+        canReroll[i]=1;
+    }
+
+    for (i=0; i<5; i++){
+      if (canReroll[i]==1)
+        printf("reroll No %d\n", i);
+    }
+  }  
 }
 
 void getScore(int die[5], struct pattern table[15], int countAmount[6]){
-    resetCounted(die, countAmount);
-    table[0].currentValue=(countAmount[0]-3)*1;
-
-    table[1].currentValue=(countAmount[1]-3)*2;
-
-    table[2].currentValue=(countAmount[2]-3)*3;
-
-    table[3].currentValue=(countAmount[3]-3)*4;
-  
-    table[4].currentValue=(countAmount[4]-3)*5;
-
-    table[5].currentValue=(countAmount[5]-3)*6;
+  resetCounted(die, countAmount);
+  table[0].currentValue=(countAmount[0]-3)*1;
+  table[1].currentValue=(countAmount[1]-3)*2;
+  table[2].currentValue=(countAmount[2]-3)*3;
+  table[3].currentValue=(countAmount[3]-3)*4;
+  table[4].currentValue=(countAmount[4]-3)*5;
+  table[5].currentValue=(countAmount[5]-3)*6;
 
   //pair
-  for (i=0; i<5; i++){
+  for (i=0; i<6; i++){
     if (countAmount[i]>1){
       table[6].currentValue=2*(i+1);
     }
   }
-  
-  int done = 0;
-  int i=0;
-  int j=0;
 
-  //pairs
-  int a=-1;
+  int a=-1; //pairs
   int b=-1;
   for (i=0; i<6; i++){
     if (countAmount[i]>1){
@@ -200,25 +237,21 @@ void getScore(int die[5], struct pattern table[15], int countAmount[6]){
   if (a!=-1 && b!=-1)
     table[7].currentValue=(2*(a+1) + 2*(b+1));
 
-  //triple
-  for (i=0; i<5; i++){
+  for (i=0; i<5; i++){ //triple
     if (countAmount[i]>2){
       table[8].currentValue=3*(i+1);
     }
   }
 
-  //mStrit
-  if(countAmount[0]==1 && countAmount[1]==1 && countAmount[2]==1 && countAmount[3]==1 && countAmount[4]==1){
+  if(countAmount[0]==1 && countAmount[1]==1 && countAmount[2]==1 && countAmount[3]==1 && countAmount[4]==1){ //mStrit
     table[9].currentValue=15; 
   }
 
-  //dStrit
-  if(countAmount[1]==1 && countAmount[2]==1 && countAmount[3]==1 && countAmount[4]==1 && countAmount[5]==1){
+  if(countAmount[1]==1 && countAmount[2]==1 && countAmount[3]==1 && countAmount[4]==1 && countAmount[5]==1){ //dStrit
     table[10].currentValue=20;
   }
 
-  //full
-  a=-1;
+  a=-1; //full
   b=-1;
   for (i=0; i<6; i++){
     if (countAmount[i]>2){
@@ -236,20 +269,19 @@ void getScore(int die[5], struct pattern table[15], int countAmount[6]){
     table[11].currentValue=3*(a+1) + 2*(b+1) + 10;  
   }
 
-  //quadlet
   for (i=0; i<6; i++){
-    if (countAmount[i]>3)
+    if (countAmount[i]>3){
       table[12].currentValue=4*(i+1)+20;
+    }
   }
   
-  //poker
-  for (i=0; i<6; i++){
+  for (i=0; i<6; i++){ //poker
     if (countAmount[i]==5){
       table[13].currentValue=5*(i+1)+50;
     }
   }
 
-  //chance
+  table[14].currentValue=0; //chance
   int chance = 0;
   for (i=0; i<6; i++){ 
     table[14].currentValue+=die[i];
@@ -259,65 +291,68 @@ void getScore(int die[5], struct pattern table[15], int countAmount[6]){
 void getPattern(int *rerollCount, int countAmount[6], struct pattern table[15]){
   char choice;
   int a;
-
-  //print out possible choices
+  int ifCrossed=1;
   for (i = 0; i<6; i++){
-    if (table[i].obtained==0){
+    if (table[i].playerScore==-100){
+      ifCrossed=0;
       printf("%d is a current value of the %s pattern, press %c to chose this score\n",table[i].currentValue, table[i].name, table[i].p);
     }
   }
 
   for (i=6; i<15; i++){
-    if (table[i].obtained==0 && table[i].currentValue!=0){
+    if (table[i].playerScore==-100 && table[i].currentValue!=0){
+      ifCrossed=0;
       printf("%d is a current value of the %s pattern, press %c to chose this score\n",table[i].currentValue, table[i].name, table[i].p);
     }
   }
-  printf("If you prefer to cross out a category, press z.\n");
-  
-  printf("Give me your choice: \n");
-  scanf(" %c", &choice);
-  a = (int) (choice - 97);
+  if (ifCrossed==0){
+    printf("Give me your choice: \n");
+    scanf(" %c", &choice);
+    a = (int) (choice - 97);
 
-  //while chosen ?
-  if (choice == 'z'){
+    while (table[a].playerScore!=-100){
+        printf("You can't fill that pattern, chose different: ");
+        scanf(" %c", &choice);
+        a = (int) (choice - 97);
+      }
+      table[a].playerScore=table[a].currentValue;
+    }
+  else if (ifCrossed==1){
+    printf("This combination cannot be accepted anywhere. You have to cross out a category.\n");
+    
     for (i=0; i<15; i++){
-      if (table[i].obtained==0){
+      if (table[i].playerScore==-100){
         printf("To cross out the %s pattern, press %c. \n", table[i].name, table[i].p);
       }
     }
-    scanf(" %c", &choice);
+   
+    scanf(" %c", &choice); 
     a = (int) (choice - 97);
+    while (table[a].playerScore!=-100){
+          printf("You can't fill that pattern, chose different: ");
+          scanf(" %c", &choice);
+          a = (int) (choice - 97);
+    }
     table[a].playerScore=0;
-    table[a].obtained=1;
   }
-
-  else{
-    while (table[a].obtained==1){
-      printf("You can't fill that pattern, chose different: ");
-      scanf(" %c", &choice);
-      a = (int) (choice - 97);
-    }
-    if (rerollCount==0){
-      table[a].playerScore = 2* table[a].currentValue;  
-    }
-    table[a].obtained=1;  
+  if (choice == 'z'){
+    
+    a = (int) (choice - 97);
   }
 } //end of getPattern function
 
 void patternsToGet(struct pattern table[15]){
-    system("clear");
   printf("Below are patterns which you are still missing: \n");
   for (i=0; i<15; i++){
-    if (table[i].obtained==0)
+    if (table[i].playerScore==-100)
       printf("%s\n", table[i].name);
   }
   printf("\n");
 }
 
 void playerMove(int die[5], int *rerollCount, int countAmount[6]){
-  patternsToGet(table); 
+  *rerollCount=0;
   fillRandomDies(die);
-  showDies(die);
   
   while (*rerollCount<2){
     patternsToGet(table);
@@ -333,23 +368,59 @@ void playerMove(int die[5], int *rerollCount, int countAmount[6]){
   *rerollCount=0;
 }
 
-void computerMove(int die[5], struct pattern table[15]){
-  int i=0;
-  int temp;
-  for (i=0; i<15; i++){
-    printf("%f procent %s\n", 100*(table[i].currentValue/(table[i].maxValue*1.0)), table[i].name);
-    table[i].currentValuesPercent = 100*(table[i].currentValue/(table[i].maxValue*1.0));
-  }
-  temp = 0;
-  for (i=1; i<15; i++){
-    if (table[i].currentValuesPercent>=table[temp].currentValuesPercent){
-      if (table[i].maxValue > table[temp].maxValue){
-        temp = i;
+void computerMove(int die[5], struct pattern table[15], int countAmount[6], int canReroll[5], int *rerollCount, int crossout[14], int *crossed){
+  
+  int valcheck=0;
+  int *temp;
+  temp=&valcheck;
+  *rerollCount = 0;
+
+  while (*rerollCount<3){
+    showDies(die);
+    resetCounted(die, countAmount);
+    getScore(die, table, countAmount);
+    
+
+    for (i=0; i<14; i++){
+     if (table[i].computerScore==-100){
+      table[i].currentValuesPercent = 100*(table[i].currentValue/(table[i].maxValue*1.0));
+      if (table[i].currentValuesPercent!=0){
+          if (table[i].currentValuesPercent>=table[*temp].currentValuesPercent){
+              *temp=i;
+          }
+        }
       }
     }
+
+    theScore(die, table, countAmount, *temp, canReroll);
+
+    for (i=0; i<5; i++){
+      if (canReroll[i]==1){
+        die[i]=rand()%6+1;
+        canReroll[i]=0;
+      }
+    }
+    (*rerollCount)++;
   }
-  printf("TEST\n");
-  printf("%d\n", temp);
+  
+  if (*temp==0 && table[0].computerScore!=-100){
+    if (table[14].computerScore==-100){
+      printf("It looks bad. I will try the chance... better to get %d points instead of crossing out a category.\n", table[14].currentValue);
+      table[14].computerScore = table[14].currentValue;
+    }
+    else {
+      while (table[crossout[*crossed]].computerScore!=-100){
+        (*crossed)++;
+      }
+      printf("I was unlucky! Let's see... I want to cross our the %s pattern.\n", table[crossout[*crossed]].name);
+      table[crossout[*crossed]].computerScore=0;
+      (*crossed)++;
+    }
+  }
+  else {
+    printf("Hmm... I want the %s pattern for %d!\n", table[*temp].name, table[*temp].currentValue);
+    table[*temp].computerScore = table[*temp].currentValue;
+  }
 }
 
 int main(){
@@ -361,7 +432,8 @@ int main(){
   int countAmount[6];
   int *rerollCount, count = 0;
   rerollCount = &count;
-  
+  int gameMoves=0;
+
   char *names[]={"ones", "twoes", "threes", "fours", "fives", "sixes", "pair", "pairs", "triple", "mStrit", "bStrit", "full", "quadlet", "poker", "chance"};
   struct pattern ones;
   struct pattern twoes;
@@ -379,9 +451,13 @@ int main(){
   struct pattern poker;
   struct pattern chance;
 
-  //chance is set to 25, free to change
   int maxValues[]={3, 6, 9, 12, 15, 18, 12, 22, 18, 15, 20, 38, 40, 80, 25};
-  
+
+  int crossout[]={13,0,1,2,3,4,5,12,9,10,11,8,7,6};
+  int iNeedThatVar = 0;
+  int *crossed;
+  crossed = &iNeedThatVar;
+
   table[0]=ones;
   table[1]=twoes;
   table[2]=threes;
@@ -404,17 +480,52 @@ int main(){
     table[i].maxValue = maxValues[i];
     table[i].currentValue=0;
     table[i].currentValuesPercent=0;
-    table[i].playerScore=1;
-    table[i].computerScore=-1;
+    table[i].playerScore=-100;
+    table[i].computerScore=-100;
     table[i].p=z;
     z++;
-    table[i].obtained = 0;
+  }
+  
+    int sumPlayer=0;
+    int sumComp=0;
+    while (gameMoves<15){
+      system("clear");  
+      sumComp=0;
+      sumPlayer=0;
+      for (i=0; i<15; i++){
+        if (table[i].computerScore!=-100)
+          sumComp+=table[i].computerScore;
+        if (table[i].playerScore!=-100)
+          sumPlayer+=table[i].playerScore;
+      }    
+    for (i=0; i<15; i++){
+      table[i].currentValue=0;
+    }
+
+    printf("Actual points:\n");
+    printf("Your score: %d\n", sumPlayer);
+    printf("Computer's score: %d\n", sumComp);
+    playerMove(die, rerollCount, countAmount);
+
+    fillRandomDies(die);
+    for (i=0; i<15; i++){
+      table[i].currentValue=0;
+    }
+    
+    resetCounted(die, countAmount);
+    computerMove(die, table, countAmount, canReroll, rerollCount, crossout, crossed);
+    gameMoves++;
+  }
+  sumPlayer=0;
+  sumComp=0;
+  for (i=0; i<15; i++){
+    sumPlayer+=table[i].playerScore;
+    sumComp+=table[i].computerScore;
   }
 
-  system("clear");  
-  int test = 6;
-  
-  playerMove(die, rerollCount, countAmount);  
-  
+  printf("END OF thE gAME!\n");
+  printf("Player's score: %d\n", sumPlayer);
+  printf("Computer's score: %d\n", sumComp);
+
   return 0;
 }
